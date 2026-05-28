@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,5 +23,11 @@ jobs:
           username: ${{ secrets.CLOUDWAYS_USER }}
           key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
           script: |
-            cd ${{ secrets.CLOUDWAYS_APP_PATH }}
+            pwd
+            ls -la
+            cd $CLOUDWAYS_APP_PATH
+            pwd
+            ls -la
             git pull origin main
+        env:
+          CLOUDWAYS_APP_PATH: ${{ secrets.CLOUDWAYS_APP_PATH }}
