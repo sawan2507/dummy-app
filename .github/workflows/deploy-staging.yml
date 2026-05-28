@@ -1,9 +1,13 @@
-name: Deploy to Cloudways Staging
+name: Deploy to Cloudways (Staging)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: cloudways-staging-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -11,20 +15,34 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4
 
-      - name: Deploy to Cloudways via SSH
+      # Upload the checked-out files to Cloudways over SSH.
+      # This avoids needing git credentials on the server.
+      - name: Upload files (SCP)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.CLOUDWAYS_HOST }}
+          username: ${{ secrets.CLOUDWAYS_USER }}
+          key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
+          port: ${{ secrets.CLOUDWAYS_PORT || 22 }}
+          source: './*,.htaccess'
+          target: ${{ secrets.CLOUDWAYS_APP_PATH }}
+          overwrite: true
+
+      # Optional post-deploy commands (clear cache, restart services, etc.)
+      - name: Post-deploy (SSH)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.CLOUDWAYS_HOST }}
           username: ${{ secrets.CLOUDWAYS_USER }}
           key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
+          port: ${{ secrets.CLOUDWAYS_PORT || 22 }}
           script: |
-            if [ ! -d ~/public_html/.git ]; then
-              echo "Git repo not found. Initializing..."
-              rm -rf ~/public_html
-              git clone https://github.com/sawan2507/dummy-app.git ~/public_html
-            else
-              cd ~/public_html
-              git pull origin main
-            fi
+            set -e
+            cd "${{ secrets.CLOUDWAYS_APP_PATH }}"
+            echo "Deployed to: $(pwd)"
+            # Add your commands here. Examples:
+            # php -v
+            # composer install --no-dev --prefer-dist --no-interaction
+            # php artisan config:clear
