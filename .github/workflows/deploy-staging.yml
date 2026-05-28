@@ -52,6 +52,10 @@ jobs:
           key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
           port: ${{ secrets.CLOUDWAYS_PORT || 22 }}
           source: './*,.htaccess'
+          exclude: |
+            .git*
+            .github*
+            .gitignore
           target: ${{ secrets.CLOUDWAYS_APP_PATH }}
           overwrite: true
           debug: true
