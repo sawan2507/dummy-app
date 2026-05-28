@@ -23,11 +23,5 @@ jobs:
           username: ${{ secrets.CLOUDWAYS_USER }}
           key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
           script: |
-            pwd
-            ls -la
-            cd $CLOUDWAYS_APP_PATH
-            pwd
-            ls -la
+            cd ~/git_repo
             git pull origin main
-        env:
-          CLOUDWAYS_APP_PATH: ${{ secrets.CLOUDWAYS_APP_PATH }}
