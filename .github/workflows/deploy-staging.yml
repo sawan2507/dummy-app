@@ -17,6 +17,31 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Validate deploy secrets
+        shell: bash
+        run: |
+          set -e
+          if [ -z "${{ secrets.CLOUDWAYS_HOST }}" ]; then echo "Missing secret: CLOUDWAYS_HOST"; exit 1; fi
+          if [ -z "${{ secrets.CLOUDWAYS_USER }}" ]; then echo "Missing secret: CLOUDWAYS_USER"; exit 1; fi
+          if [ -z "${{ secrets.CLOUDWAYS_SSH_KEY }}" ]; then echo "Missing secret: CLOUDWAYS_SSH_KEY"; exit 1; fi
+          if [ -z "${{ secrets.CLOUDWAYS_APP_PATH }}" ]; then echo "Missing secret: CLOUDWAYS_APP_PATH"; exit 1; fi
+
+      - name: Prepare target directory (SSH)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.CLOUDWAYS_HOST }}
+          username: ${{ secrets.CLOUDWAYS_USER }}
+          key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
+          port: ${{ secrets.CLOUDWAYS_PORT || 22 }}
+          script: |
+            set -e
+            TARGET="${{ secrets.CLOUDWAYS_APP_PATH }}"
+            echo "Target: $TARGET"
+            mkdir -p "$TARGET"
+            test -d "$TARGET"
+            test -w "$TARGET"
+            touch "$TARGET/.deploy_write_test" && rm -f "$TARGET/.deploy_write_test"
+
       # Upload the checked-out files to Cloudways over SSH.
       # This avoids needing git credentials on the server.
       - name: Upload files (SCP)
@@ -29,6 +54,7 @@ jobs:
           source: './*,.htaccess'
           target: ${{ secrets.CLOUDWAYS_APP_PATH }}
           overwrite: true
+          debug: true
 
       # Optional post-deploy commands (clear cache, restart services, etc.)
       - name: Post-deploy (SSH)
