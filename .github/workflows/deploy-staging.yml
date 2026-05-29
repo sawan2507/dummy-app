@@ -19,6 +19,7 @@ jobs:
           host: ${{ secrets.CLOUDWAYS_HOST }}
           username: ${{ secrets.CLOUDWAYS_USERNAME }}
           password: ${{ secrets.CLOUDWAYS_PASSWORD }}
+          key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
           port: 22
           script: |
             echo "Navigating to application directory..."
