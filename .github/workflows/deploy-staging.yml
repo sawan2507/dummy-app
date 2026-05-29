@@ -3,7 +3,7 @@ name: Deploy to Cloudways
 on:
   push:
     branches:
-      - main  # Change this to 'master' if your default branch is master
+      - main
 
 jobs:
   deploy:
@@ -20,13 +20,20 @@ jobs:
           username: ${{ secrets.CLOUDWAYS_USER }}
           key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
           port: 22
+          script_stop: true
           script: |
             echo "Navigating to application directory..."
-            cd ~/public_html
-
+            cd ~/public_html || exit 1
+            
+            echo "Configuring Git with HTTPS authentication..."
+            git config --global url."https://github.com/".insteadOf "git://github.com/"
+            
             echo "Fetching latest changes from Git..."
-            # Resetting helps discard minor file permission drift or local edits on the server
             git fetch --all
-            #git reset --hard origin/main
+            git reset --hard origin/main
             
             echo "Deployment completed successfully!"
+        env:
+          GIT_ASKPASS: echo
+          GIT_PASSWORD: ${{ secrets.GIT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
