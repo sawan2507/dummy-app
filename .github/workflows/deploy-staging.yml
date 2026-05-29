@@ -29,6 +29,6 @@ jobs:
             echo "Fetching latest changes from Git..."
             # Resetting helps discard minor file permission drift or local edits on the server
             git fetch --all
-            git reset --hard origin/main
+            git reset --hard origin main
             
             echo "Deployment completed successfully!"
