@@ -17,8 +17,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.CLOUDWAYS_HOST }}
-          username: ${{ secrets.CLOUDWAYS_USERNAME }}
-          password: ${{ secrets.CLOUDWAYS_PASSWORD }}
+          username: ${{ secrets.CLOUDWAYS_USER }}
           key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
           port: 22
           script: |
