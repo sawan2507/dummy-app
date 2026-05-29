@@ -214,7 +214,7 @@
     <main class="shell">
       <div class="brand" aria-label="Brand">
         <div class="logo" aria-hidden="true"></div>
-        <h1>Website update in progress</h1>
+        <h1>We are coming soon</h1>
       </div>
 
       <section class="card" aria-label="Coming soon card">
