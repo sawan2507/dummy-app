@@ -1,0 +1,37 @@
+name: Deploy to Cloudways Staging
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudways Staging
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.CLOUDWAYS_STAGING_HOST }}
+          username: ${{ secrets.CLOUDWAYS_STAGING_USER }}
+          key: ${{ secrets.CLOUDWAYS_STAGING_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            cd ~/public_html || exit 1
+
+            echo "=== Pulling staging branch ==="
+            git remote set-url origin "https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/sawan2507/dummy-app.git"
+            git fetch origin staging
+            git reset --hard origin/staging
+            git clean -fd
+            git remote set-url origin "https://github.com/sawan2507/dummy-app.git"
+
+            echo "=== Reset OPcache ==="
+            php -r 'if (function_exists("opcache_reset")) { opcache_reset(); echo "OPcache reset\n"; }'
+
+            echo "Staging deployment completed successfully!"
