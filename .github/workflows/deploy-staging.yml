@@ -35,4 +35,7 @@ jobs:
             pwd
             ls -la
 
+            echo "=== Purging PHP OPcache if available ==="
+            php -r 'if (function_exists("opcache_reset")) { opcache_reset(); echo "OPcache reset\n"; } else { echo "OPcache not enabled\n"; }'
+
             echo "Deployment completed successfully!"
