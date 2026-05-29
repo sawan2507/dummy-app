@@ -18,36 +18,17 @@ jobs:
         with:
           host: ${{ secrets.CLOUDWAYS_HOST }}
           username: ${{ secrets.CLOUDWAYS_USER }}
+          password: ${{ secrets.CLOUDWAYS_PASSWORD }}
           key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
           port: 22
-          script_stop: true
           script: |
-            echo "=== Diagnostic Info ==="
+            echo "Navigating to application directory..."
+            cd ~/public_html
             pwd
-            echo "Current directory: ~/public_html"
-            cd ~/public_html || exit 1
-            pwd
-            
-            echo ""
-            echo "=== Git Remote Info ==="
-            git remote -v
-            
-            echo ""
-            echo "=== SSH Known Hosts ==="
-            ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null || true
-            
-            echo ""
-            echo "=== Fetching with HTTPS Token ==="
-            git remote set-url origin "https://${{ secrets.GIT_TOKEN }}@github.com/sawan2507/dummy-app.git"
+
+            echo "Fetching latest changes from Git..."
+            # Resetting helps discard minor file permission drift or local edits on the server
             git fetch --all
-            
-            echo ""
-            echo "=== Resetting to main ==="
             git reset --hard origin/main
             
-            echo ""
-            echo "=== Cleanup: Remove token from config ==="
-            git remote set-url origin "https://github.com/sawan2507/dummy-app.git"
-            
-            echo ""
             echo "Deployment completed successfully!"
