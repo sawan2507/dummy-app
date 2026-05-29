@@ -22,27 +22,17 @@ jobs:
           key: ${{ secrets.CLOUDWAYS_SSH_KEY }}
           port: 22
           script: |
-            echo "=== Diagnostic Info ==="
-            pwd
             cd ~/public_html || exit 1
-            pwd
 
-            echo ""
-            echo "=== Git Remote Info ==="
-            git remote -v
-
-            echo ""
-            echo "=== Fetching with HTTPS Token ==="
+            echo "=== Pulling latest PHP code ==="
             git remote set-url origin "https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/sawan2507/dummy-app.git"
             git fetch origin main
-
-            echo ""
-            echo "=== Resetting to main ==="
             git reset --hard origin/main
-
-            echo ""
-            echo "=== Cleanup: Remove token from config ==="
+            git clean -fd
             git remote set-url origin "https://github.com/sawan2507/dummy-app.git"
 
-            echo ""
+            echo "=== Verify deployed files ==="
+            pwd
+            ls -la
+
             echo "Deployment completed successfully!"
