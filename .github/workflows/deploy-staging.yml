@@ -22,7 +22,7 @@ jobs:
           port: 22
           script: |
             echo "Navigating to application directory..."
-            cd ~/applications/trswxsregt/public_html
+            cd ~/public_html
 
             echo "Fetching latest changes from Git..."
             # Resetting helps discard minor file permission drift or local edits on the server
